@@ -61,14 +61,27 @@ class EmployeeAndDepartmentList(APIView):
         # multipart_file = request.POST.get('image')
         #parsed = MultiPartParser.parse(multiPartFile)
         img = PIL.Image.open(request.data.get('image'))
-        name = return_faculty_name(img)
+        id = return_faculty_id(img)
+
+        if id == 0:
+            table = DepartmentEmployeeTable()
+            table.name = 'None'
+            tableList = [table, DepartmentEmployeeTable()]
+            serializer = DepartmentEmployeeSerializer(tableList, many=True, context={'request' : request})
+
+            content = {
+                'employee' : serializer.data
+            }
+            return Response(content)
+            
+
         facultyData = Faculty.objects.get(id=1)
         emp_db_name = Employee.objects.model._meta.db_table
         dep_db_name = Department.objects.model._meta.db_table
+
+        #join tables department and employee according to faculty id and put them in a temporary model DepartmentEmployeeTable
         querySet = DepartmentEmployeeTable.objects.raw(f'SELECT {emp_db_name}.id, {emp_db_name}.first_name, {emp_db_name}.last_name, {emp_db_name}.office_place1, {dep_db_name}.office_place, {dep_db_name}.name FROM {dep_db_name}\
-        INNER JOIN {emp_db_name} ON {dep_db_name}.faculty_id = 1 AND {emp_db_name}.department_employees_id = {dep_db_name}.id')        
-        for set in querySet:
-            print(set.first_name, set.last_name, set.office_place, set.name)
+        INNER JOIN {emp_db_name} ON {dep_db_name}.faculty_id = {id} AND {emp_db_name}.department_employees_id = {dep_db_name}.id')        
         #employeeData = Employee.objects.filter(department_employees__faculty_id=facultyData.id) 
         
         #converts to JSON
@@ -86,10 +99,7 @@ class EmployeeAndDepartmentList(APIView):
             'employee' : departmentEmployeeSerializer.data
         }
 
-        #Returns data back to client
-
-        # data=request.data
-        # print(data['data'])
+        #send temporary model back to client
         return Response(content)
 
 

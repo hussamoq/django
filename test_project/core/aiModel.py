@@ -16,6 +16,8 @@ from object_detection.utils import ops as utils_ops
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 from .models import Employee
+import re
+
 
 class Model:
     detection_model = tf.saved_model.load("C:\\Users\\Hussa\\Desktop\\TF2\\Experiment\\inference\\ExportedSavedModel\\saved_model")
@@ -47,10 +49,30 @@ def run_inference_for_single_image(model, image):
 
     score = output_dict['detection_scores'][0]
     if score < 0.6:
-        return "None"   
+        return "none"   
     
     return category_index[output_dict['detection_classes'][0]]['name']
     
-def return_faculty_name(image):
+def return_faculty_id(image):
+    #return the name of the faculty 
     name = run_inference_for_single_image(Model.detection_model, image)
-    return name
+
+    #remove any numbers inside name 
+    name = re.sub('[123]', '', name)
+    name = name.lower()
+
+    #faculties IDs according to the database
+    faculties_ids={
+        'none' : 0,
+        "kasit": 1,
+        "medicine": 2,
+        "engineering": 3,
+        "shareeah": 4,
+        "business": 5,
+        "law": 7,
+        "kitchen": 8,
+    }
+
+    print(name)
+
+    return faculties_ids[name]
