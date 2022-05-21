@@ -15,12 +15,28 @@ from IPython.display import display
 from object_detection.utils import ops as utils_ops
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
-from .models import Employee
+from .models import *
 import re
-
 
 class Model:
     detection_model = tf.saved_model.load("C:\\Users\\Hussa\\Desktop\\TF2\\Experiment\\inference\\ExportedSavedModel\\saved_model")
+
+    getId = {}
+    #map each original name from database to ID
+    for id_and_name in Faculty.objects.values('id', 'name'):
+        getId[id_and_name['name']] = id_and_name['id'] 
+
+    #map names coming from model to their ids using the map "getId"
+    faculties_ids={
+        'none' : 0,
+        "kasit": getId['King Abdulla II School For Information Technology'],
+        "medicine": getId['School of Medicine'],
+        "engineering": getId['School of Engineering'],
+        "shareeah": getId['School of Sharia'],
+        "business": getId['School of Business'],
+        "law": getId['School of Law'],
+        "kitchen": getId['noe'],
+    }
 
 # patch tf1 into `utils.ops`
 utils_ops.tf = tf.compat.v1
@@ -61,18 +77,4 @@ def return_faculty_id(image):
     name = re.sub('[123]', '', name)
     name = name.lower()
 
-    #faculties IDs according to the database
-    faculties_ids={
-        'none' : 0,
-        "kasit": 1,
-        "medicine": 2,
-        "engineering": 3,
-        "shareeah": 4,
-        "business": 5,
-        "law": 7,
-        "kitchen": 8,
-    }
-
-    print(name)
-
-    return faculties_ids[name]
+    return Model.faculties_ids[name]

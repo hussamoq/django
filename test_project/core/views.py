@@ -110,21 +110,23 @@ class EmployeeAndDepartmentList(APIView):
         img = PIL.Image.open(request.data.get('image'))
         fac_id = return_faculty_id(img)
 
-        if fac_id == 0:
-            table = DepartmentEmployeeTable()
-            table.name = 'None'
-            tableList = [table, DepartmentEmployeeTable()]
-            serializer = DepartmentEmployeeSerializer(tableList, many=True, context={'request' : request})
+        # if fac_id == 0:
+        #     table = DepartmentEmployeeTable()
+        #     table.name = 'None'
+        #     tableList = [table, DepartmentEmployeeTable()]
+        #     serializer = DepartmentEmployeeSerializer(tableList, many=True, context={'request' : request})
 
-            content = {
-                'employee' : serializer.data
-            }
-            return Response(content)
+        #     content = {
+        #         'employee' : serializer.data
+        #     }
+        #     return Response(content)
             
 
         facultyData = Faculty.objects.get(id=8)
         emp_db_name = Employee.objects.model._meta.db_table
         dep_db_name = Department.objects.model._meta.db_table
+        for field in Faculty.objects.values('id', 'name'):
+            print(field)
 
         #join tables department and employee according to faculty id and put them in a temporary model DepartmentEmployeeTable
         querySet = DepartmentEmployeeTable.objects.raw(f'SELECT {emp_db_name}.id, {emp_db_name}.first_name, {emp_db_name}.last_name, {emp_db_name}.office_place1, {dep_db_name}.office_place, {dep_db_name}.name FROM {dep_db_name}\
