@@ -5,7 +5,7 @@ from versatileimagefield.fields import VersatileImageField, PPOIField
 # Create your models here.
 
 class Faculty(models.Model):
-    name=models.CharField(max_length=20)
+    name=models.CharField(max_length=50)
     faculty_dean=models.CharField(max_length=40,default='none')
     faculty_info=models.TextField(default="unknown")
     established_date=models.IntegerField(default=2000)
@@ -24,7 +24,7 @@ class Employee(models.Model):
     department_employees=models.ForeignKey(Department,on_delete=models.CASCADE)
     first_name=models.CharField(max_length=20)
     last_name=models.CharField(max_length=20)
-    office_place1=models.CharField(max_length=50,default='None')
+    office_place1=models.CharField(max_length=50,default='None', blank=True)
     
 
     def __str__(self):

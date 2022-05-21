@@ -22,7 +22,7 @@ urlpatterns =[
     path('', views.index, name='index'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
-    path('emp/',views.EmployeeAndDepartmentList.as_view(),name='post'),
+    path('emp/',views.EmployeeAndDepartmentList.as_view(),name='POST'),
     # path('success', views.success, name = 'success'),
     # path('image_upload', views.faculty_image_view, name = 'image_upload'),
 ]
