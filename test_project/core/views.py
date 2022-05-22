@@ -3,6 +3,7 @@ from django.shortcuts import render
 from matplotlib.style import context
 from .models import *
 from django.http import HttpResponse
+from django.http import QueryDict
 from .aiModel import *
 import re
 from rest_framework import viewsets
@@ -124,9 +125,10 @@ class EmployeeList(APIView):
     def get(self, request):
         if request.headers.get('authentication-token') != SECRET_TOKEN:
             return
-
-        #get id provided from client
-        facultyData = Faculty.objects.get(id=request.headers.get('id'))
+        #convert raw query dict into a query dict object   
+        query = QueryDict(request.META['QUERY_STRING'])
+        #this id is requested by the client
+        fac_id = int(query.get('id'))
 
         #raw table names of employee and department
         emp_db_name = Employee.objects.model._meta.db_table
@@ -134,7 +136,7 @@ class EmployeeList(APIView):
 
         #join tables department and employee according to faculty id and put them in a temporary model DepartmentEmployeeTable
         querySet = DepartmentEmployeeTable.objects.raw(f'SELECT {emp_db_name}.id, {emp_db_name}.first_name, {emp_db_name}.last_name, {emp_db_name}.office_place1, {dep_db_name}.office_place, {dep_db_name}.name FROM {dep_db_name}\
-        INNER JOIN {emp_db_name} ON {dep_db_name}.faculty_id = {1} AND {emp_db_name}.department_employees_id = {dep_db_name}.id')
+        INNER JOIN {emp_db_name} ON {dep_db_name}.faculty_id = {fac_id} AND {emp_db_name}.department_employees_id = {dep_db_name}.id')
 
         serializer_context = {
             'request': request,
