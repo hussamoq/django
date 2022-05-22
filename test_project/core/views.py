@@ -18,6 +18,7 @@ from requests_toolbelt.multipart import MultipartDecoder
 from .forms import *
 import PIL.Image
 
+SECRET_TOKEN = 'hashtag@#ploaanhyvybal*1288mmc32*())(!'
 
 # Create your views here.
 def index(request):
@@ -56,60 +57,17 @@ def index(request):
 #EmployeeAndDepartmentList
 #Model.objects.model._meta.db_table
 class EmployeeAndDepartmentList(APIView):
-    # def get(self, request):
-    #     #all employees
-    #     # multipart_file = request.POST.get('image')
-    #     #parsed = MultiPartParser.parse(multiPartFile)
-    #     img = PIL.Image.open(request.data.get('image'))
-    #     fac_id = return_faculty_id(img)
-
-    #     if fac_id == 0:
-    #         table = DepartmentEmployeeTable()
-    #         table.name = 'None'
-    #         tableList = [table, DepartmentEmployeeTable()]
-    #         serializer = DepartmentEmployeeSerializer(tableList, many=True, context={'request' : request})
-
-    #         content = {
-    #             'employee' : serializer.data
-    #         }
-    #         return Response(content)
-            
-
-    #     facultyData = Faculty.objects.get(id=2)
-    #     emp_db_name = Employee.objects.model._meta.db_table
-    #     dep_db_name = Department.objects.model._meta.db_table
-
-    #     #join tables department and employee according to faculty id and put them in a temporary model DepartmentEmployeeTable
-    #     querySet = DepartmentEmployeeTable.objects.raw(f'SELECT {emp_db_name}.id, {emp_db_name}.first_name, {emp_db_name}.last_name, {emp_db_name}.office_place1, {dep_db_name}.office_place, {dep_db_name}.name FROM {dep_db_name}\
-    #     INNER JOIN {emp_db_name} ON {dep_db_name}.faculty_id = {2} AND {emp_db_name}.department_employees_id = {dep_db_name}.id')        
-    #     #employeeData = Employee.objects.filter(department_employees__faculty_id=facultyData.id) 
-        
-    #     #converts to JSON
-    #     serializer_context = {
-    #         'request': request,
-    #     }
-        
-    #     #employeeSerializer = EmployeeSerializer(employeeData, many=True,context=serializer_context)
-    #     departmentEmployeeSerializer = DepartmentEmployeeSerializer(querySet, many=True, context=serializer_context)
-    #     facultySerializer = FacultySerializer(facultyData, many=False, context=serializer_context)
-        
-    #     content = {
-    #         'faculty': facultySerializer.data,
-    #         #'employee': employeeSerializer.data,
-    #         'employee' : departmentEmployeeSerializer.data
-    #     }
-
-    #     #send temporary model back to client
-    #     return Response(content)
-
 
     def post(self, request):
-        #all employees
-        # multipart_file = request.POST.get('image')
-        #parsed = MultiPartParser.parse(multiPartFile)
+        #if client not authenticated then abort operation
+        if request.headers.get('authentication-token') != SECRET_TOKEN:
+            return
+
+        #get image from request and pass it to PIL.Image object
         img = PIL.Image.open(request.data.get('image'))
         fac_id = return_faculty_id(img)
 
+        # #If nothing detected, then return an empty table
         # if fac_id == 0:
         #     table = DepartmentEmployeeTable()
         #     table.name = 'None'
@@ -122,15 +80,13 @@ class EmployeeAndDepartmentList(APIView):
         #     return Response(content)
             
 
-        facultyData = Faculty.objects.get(id=8)
+        facultyData = Faculty.objects.get(id=1)
         emp_db_name = Employee.objects.model._meta.db_table
         dep_db_name = Department.objects.model._meta.db_table
-        for field in Faculty.objects.values('id', 'name'):
-            print(field)
 
         #join tables department and employee according to faculty id and put them in a temporary model DepartmentEmployeeTable
         querySet = DepartmentEmployeeTable.objects.raw(f'SELECT {emp_db_name}.id, {emp_db_name}.first_name, {emp_db_name}.last_name, {emp_db_name}.office_place1, {dep_db_name}.office_place, {dep_db_name}.name FROM {dep_db_name}\
-        INNER JOIN {emp_db_name} ON {dep_db_name}.faculty_id = {8} AND {emp_db_name}.department_employees_id = {dep_db_name}.id')        
+        INNER JOIN {emp_db_name} ON {dep_db_name}.faculty_id = {1} AND {emp_db_name}.department_employees_id = {dep_db_name}.id')        
         #employeeData = Employee.objects.filter(department_employees__faculty_id=facultyData.id) 
         
         #converts to JSON
@@ -150,19 +106,45 @@ class EmployeeAndDepartmentList(APIView):
 
         #send temporary model back to client
         return Response(content)
-
-
-# def faculty_image_view(request):
   
-#     if request.method == 'POST':
-#         form = Faculty_Image(request.POST, request.FILES)  
-#         if form.is_valid():
-#             form.save()
-#             return redirect('success')
-#     else:
-#         form = Faculty_Image()
-#     return render(request, 'index.html', {'form' : form})
-  
+
+#used to fetch all faculties
+class FacultyList(APIView):
+    def get(self, request):
+        if request.headers.get('authentication-token') != SECRET_TOKEN:
+            return
+
+        #Already is serialized 
+        facultyObjects = Faculty.objects.values('name', 'id')
+
+        return Response(facultyObjects)
+
+#used to fetch all employees based on faculty id
+class EmployeeList(APIView):
+    def get(self, request):
+        if request.headers.get('authentication-token') != SECRET_TOKEN:
+            return
+
+        #get id provided from client
+        facultyData = Faculty.objects.get(id=request.headers.get('id'))
+
+        #raw table names of employee and department
+        emp_db_name = Employee.objects.model._meta.db_table
+        dep_db_name = Department.objects.model._meta.db_table
+
+        #join tables department and employee according to faculty id and put them in a temporary model DepartmentEmployeeTable
+        querySet = DepartmentEmployeeTable.objects.raw(f'SELECT {emp_db_name}.id, {emp_db_name}.first_name, {emp_db_name}.last_name, {emp_db_name}.office_place1, {dep_db_name}.office_place, {dep_db_name}.name FROM {dep_db_name}\
+        INNER JOIN {emp_db_name} ON {dep_db_name}.faculty_id = {1} AND {emp_db_name}.department_employees_id = {dep_db_name}.id')
+
+        serializer_context = {
+            'request': request,
+        }
+
+        departmentEmployeeSerializer = DepartmentEmployeeSerializer(querySet, many=True, context=serializer_context)
+
+        return Response(departmentEmployeeSerializer.data)
+
+        
   
 # def success(request):
 #     return HttpResponse('successfully uploaded')

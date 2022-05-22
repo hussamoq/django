@@ -35,7 +35,7 @@ class Model:
         "shareeah": getId['School of Sharia'],
         "business": getId['School of Business'],
         "law": getId['School of Law'],
-        "kitchen": getId['noe'],
+        "kitchen": getId['Community Restaurant'],
     }
 
 # patch tf1 into `utils.ops`
