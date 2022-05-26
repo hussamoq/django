@@ -18,6 +18,8 @@ from object_detection.utils import visualization_utils as vis_util
 from .models import *
 import re
 
+MIN_DETECTION_SCORE = 0.7
+
 class Model:
     detection_model = tf.saved_model.load("C:\\Users\\Hussa\\Desktop\\TF2\\Experiment\\inference\\ExportedSavedModel\\saved_model")
 
@@ -64,7 +66,7 @@ def run_inference_for_single_image(model, image):
     output_dict['num_detections'] = num_detections
 
     score = output_dict['detection_scores'][0]
-    if score < 0.6:
+    if score < MIN_DETECTION_SCORE:
         return "none"   
     
     return category_index[output_dict['detection_classes'][0]]['name']
