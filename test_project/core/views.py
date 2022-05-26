@@ -67,6 +67,7 @@ class EmployeeAndDepartmentList(APIView):
         #get image from request and pass it to PIL.Image object
         img = PIL.Image.open(request.data.get('image'))
         fac_id = return_faculty_id(img)
+        print(fac_id)
 
         #If nothing detected, then return an empty table
         if fac_id == 0:

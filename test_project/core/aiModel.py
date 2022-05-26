@@ -18,7 +18,7 @@ from object_detection.utils import visualization_utils as vis_util
 from .models import *
 import re
 
-MIN_DETECTION_SCORE = 0.7
+MIN_DETECTION_SCORE = 0.6
 
 class Model:
     detection_model = tf.saved_model.load("C:\\Users\\Hussa\\Desktop\\TF2\\Experiment\\inference\\ExportedSavedModel\\saved_model")
@@ -38,6 +38,9 @@ class Model:
         "business": getId['School of Business'],
         "law": getId['School of Law'],
         "kitchen": getId['Community Restaurant'],
+        "educational" : getId['School of Education'],
+        'nursing': getId['School of Nursing'],
+        'pharamcy': getId['School of Pharmacy'],
     }
 
 # patch tf1 into `utils.ops`
@@ -64,7 +67,7 @@ def run_inference_for_single_image(model, image):
     output_dict = {key:value[0, :num_detections].numpy() 
     for key,value in output_dict.items()}
     output_dict['num_detections'] = num_detections
-
+    print(output_dict['detection_scores'][0])
     score = output_dict['detection_scores'][0]
     if score < MIN_DETECTION_SCORE:
         return "none"   
@@ -78,5 +81,5 @@ def return_faculty_id(image):
     #remove any numbers inside name 
     name = re.sub('[123]', '', name)
     name = name.lower()
-
+    
     return Model.faculties_ids[name]
