@@ -40,7 +40,7 @@ class Model:
         "kitchen": getId['Community Restaurant'],
         "educational" : getId['School of Education'],
         'nursing': getId['School of Nursing'],
-        'pharamcy': getId['School of Pharmacy'],
+        'pharamcy': getId['School of Pharmacy']
     }
 
 # patch tf1 into `utils.ops`
