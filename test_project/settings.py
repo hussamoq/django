@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '192.168.0.161', '127.0.0.1', '.ngrok.io', '.loophole.site']
 
-CSRF_TRUSTED_ORIGINS = ['https://locator.loophole.site', 'https://.loophole.site']
+CSRF_TRUSTED_ORIGINS = ['https://locator.loophole.site', 'https://.loophole.site', 'https://ngrok.io', 'https://09b6-92-253-31-72.ngrok.io']
 # Application definition
 
 INSTALLED_APPS = [
@@ -136,5 +136,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-

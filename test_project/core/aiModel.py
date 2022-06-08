@@ -20,6 +20,8 @@ import re
 
 MIN_DETECTION_SCORE = 0.6
 
+#this class Model loads the trained model and the neccassary id and names from database
+# into main memory at program initialization 
 class Model:
     detection_model = tf.saved_model.load("C:\\Users\\Hussa\\Desktop\\TF2\\Experiment\\inference\\ExportedSavedModel\\saved_model")
 
@@ -38,10 +40,18 @@ class Model:
         "business": getId['School of Business'],
         "law": getId['School of Law'],
         "kitchen": getId['Community Restaurant'],
-        "educational" : getId['School of Education'],
+        "educational" : getId['School of Educational Sciences'],
         'nursing': getId['School of Nursing'],
-        'pharamcy': getId['School of Pharmacy']
-    }
+        'pharamcy': getId['School of Pharmacy'],
+        'dentistry' : getId['School of Dentistry'],
+        'rehabilitation' : getId['School of Rehabilitation Sciences'],
+        'arts - design' : getId['School of Arts and Design'],
+        'languages' : getId['School of Foreign Languages'],
+        'arts' : getId['School of Arts'],
+        'science' : getId['School of Science'],
+        }
+
+    print(faculties_ids)
 
 # patch tf1 into `utils.ops`
 utils_ops.tf = tf.compat.v1
@@ -67,8 +77,9 @@ def run_inference_for_single_image(model, image):
     output_dict = {key:value[0, :num_detections].numpy() 
     for key,value in output_dict.items()}
     output_dict['num_detections'] = num_detections
-    print(output_dict['detection_scores'][0])
+
     score = output_dict['detection_scores'][0]
+    print(score)
     if score < MIN_DETECTION_SCORE:
         return "none"   
     
@@ -83,3 +94,4 @@ def return_faculty_id(image):
     name = name.lower()
     
     return Model.faculties_ids[name]
+    

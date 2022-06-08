@@ -60,9 +60,9 @@ def index(request):
 class EmployeeAndDepartmentList(APIView):
 
     def post(self, request):
-        # #if client not authenticated then abort operation
-        # if request.headers.get('authentication-token') != SECRET_TOKEN:
-        #     return
+        #if client not authenticated then abort operation
+        if request.headers.get('authentication-token') != SECRET_TOKEN:
+            return
 
         #get image from request and pass it to PIL.Image object
         img = PIL.Image.open(request.data.get('image'))
@@ -117,7 +117,6 @@ class EmployeeAndDepartmentList(APIView):
         #get image from request and pass it to PIL.Image object
         img = PIL.Image.open(request.data.get('image'))
         fac_id = return_faculty_id(img)
-        print(fac_id)
 
         #If nothing detected, then return an empty table
         if fac_id == 0:
